@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="heading_1">26sp</dimen>
+    <dimen name="heading_2">24sp</dimen>
+    <dimen name="sub_heading_1">18sp</dimen>
+    <dimen name="margin_1">30dp</dimen>
+    <dimen name="margin_2">15dp</dimen>
+    <dimen name="margin_3">10dp</dimen>
+    <dimen name="padding_1">20dp</dimen>
+    <dimen name="padding_2">10dp</dimen>
+</resources>

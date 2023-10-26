@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "350529995867",
+    "project_id": "user-management-system-f2f40",
+    "storage_bucket": "user-management-system-f2f40.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:350529995867:android:4b253905568a3b88c2eb7e",
+        "android_client_info": {
+          "package_name": "com.example.infovault"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaRwKzHtcQ9VP-seXD_IujDvt-3vuUoAE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

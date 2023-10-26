@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">infovault</string>
+    <string name="login">Login</string>
+    <string name="email_id">Email Id</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="register">Register</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="new_to_the_app">New to the app?</string>
+    <string name="already_registered">Already registered?</string>
+    <string name="log_out">Log out</string>
+    <string name="first_name">First name</string>
+    <string name="profile">Profile</string>
+    <string name="last_name">Last name</string>
+    <string name="address">Address</string>
+    <string name="city">City</string>
+    <string name="pincode">Pincode</string>
+    <string name="_91">+91</string>
+    <string name="mobile_number">Mobile number</string>
+    <string name="save">Save</string>
+    <string name="select_gender">Select gender</string>
+    <string name="infovault">Infovault</string>
+</resources>
