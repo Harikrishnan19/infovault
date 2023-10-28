@@ -1,21 +1,27 @@
 package com.example.infovault;
 
-import static com.example.infovault.utils.Constants.COL_USERS;
-import static com.example.infovault.utils.Constants.GENDER_ITEMS;
+import static com.example.infovault.interfaces.Constants.GENDER_ITEMS;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.infovault.databinding.ActivityMainBinding;
+import com.example.infovault.interfaces.Collections;
+import com.example.infovault.interfaces.LogEvents;
+import com.example.infovault.interfaces.Roles;
+import com.example.infovault.models.LogEvent;
 import com.example.infovault.models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -26,6 +32,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.time.Instant;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
             navigateToLogin();
         } else {
             binding.email.setText(getCurrentUser().getEmail());
+            enableAdminFn();
             fetchData();
         }
     }
@@ -53,20 +63,14 @@ public class MainActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
-        binding.email.setEnabled(false);
+        Toolbar toolbar = binding.toolbar.getRoot();
+        setSupportActionBar(toolbar);
 
+        binding.email.setEnabled(false);
         initializeSpinner();
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-
-        binding.logOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                firebaseLogout();
-                navigateToLogin();
-            }
-        });
 
         binding.saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,11 +80,33 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.settings, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.log_out){
+            FirebaseUser user = getCurrentUser();
+            if(user != null){
+                logLogoutEvent(user);
+                firebaseLogout();
+            }
+            navigateToLogin();
+        } else if(item.getItemId() == R.id.view_logs){
+            navigateToLogs();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void saveData(){
         binding.saveBtn.setEnabled(false);
         User user = captureValues();
         String userId = mAuth.getCurrentUser().getUid();
-        DocumentReference docRef = db.collection(COL_USERS).document(userId);
+        DocumentReference docRef = db.collection(Collections.USERS).document(userId);
                 docRef.set(user)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -100,6 +126,24 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    private void enableAdminFn(){
+        String userId = mAuth.getCurrentUser().getUid();
+        db.collection(Collections.ROLE_USER_MT)
+                .whereEqualTo("uuid", userId)
+                .whereEqualTo("role", Roles.ADMIN)
+                .limit(1)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful() && !task.getResult().isEmpty()){
+                            MenuItem menuItem = binding.toolbar.getRoot().getMenu().findItem(R.id.view_logs);
+                            menuItem.setVisible(true);
+                        }
+                    }
+                });
+    }
+
     private User captureValues(){
         User user = new User();
         user.firstName = binding.firstName.getText().toString();
@@ -115,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void fetchData(){
         String userId = mAuth.getCurrentUser().getUid();
-        DocumentReference docRef = db.collection(COL_USERS).document(userId);
+        DocumentReference docRef = db.collection(Collections.USERS).document(userId);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -167,5 +211,30 @@ public class MainActivity extends AppCompatActivity {
     private void navigateToLogin(){
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
+    }
+
+    private void navigateToLogs(){
+        Intent intent = new Intent(this, LogsActivity.class);
+        startActivity(intent);
+    }
+
+    private void logLogoutEvent(FirebaseUser user){
+        LogEvent log = new LogEvent();
+        log.uuid = user.getUid();
+        log.emailId = user.getEmail();
+        log.event = LogEvents.LOG_OUT;
+        log.timestamp = Instant.now().toString();
+
+        db.collection(Collections.LOGS)
+                .add(log)
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if(task.isSuccessful())
+                            Log.d(TAG, "logout event logged successfully.");
+                        else
+                            Log.e(TAG, "logout event failed to be logged.");
+                    }
+                });
     }
 }

@@ -11,16 +11,28 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.infovault.databinding.ActivityRegisterBinding;
+import com.example.infovault.interfaces.Collections;
+import com.example.infovault.interfaces.LogEvents;
+import com.example.infovault.models.LogEvent;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
     private static final String TAG = RegisterActivity.class.getName();
     private ActivityRegisterBinding binding;
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(view);
 
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         binding.login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,7 +109,11 @@ public class RegisterActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
-                            navigateToHome();
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            if(user != null){
+                                logRegisterEvent(user);
+                                navigateToHome();
+                            }
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -118,6 +135,26 @@ public class RegisterActivity extends AppCompatActivity {
     private void navigateToHome(){
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+    }
+
+    private void logRegisterEvent(FirebaseUser user){
+        LogEvent log = new LogEvent();
+        log.uuid = user.getUid();
+        log.emailId = user.getEmail();
+        log.event = LogEvents.REGISTER;
+        log.timestamp = Instant.now().toString();
+
+        db.collection(Collections.LOGS)
+                .add(log)
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if(task.isSuccessful())
+                            Log.d(TAG, "register event logged successfully.");
+                        else
+                            Log.e(TAG, "register event failed to be logged.");
+                    }
+                });
     }
 
 }

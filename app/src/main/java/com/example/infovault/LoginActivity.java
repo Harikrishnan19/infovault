@@ -11,17 +11,27 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.infovault.databinding.ActivityLoginBinding;
+import com.example.infovault.interfaces.Collections;
+import com.example.infovault.interfaces.LogEvents;
+import com.example.infovault.models.LogEvent;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = LoginActivity.class.getName();
     private ActivityLoginBinding binding;
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onStart() {
@@ -40,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(view);
 
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         binding.register.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,7 +114,10 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            navigateToHome();
+                            if(user != null){
+                                logLoginEvent(user);
+                                navigateToHome();
+                            }
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
@@ -141,5 +155,25 @@ public class LoginActivity extends AppCompatActivity {
     private void navigateToHome(){
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+    }
+
+    private void logLoginEvent(FirebaseUser user){
+        LogEvent log = new LogEvent();
+        log.uuid = user.getUid();
+        log.emailId = user.getEmail();
+        log.event = LogEvents.LOG_IN;
+        log.timestamp = Instant.now().toString();
+
+        db.collection(Collections.LOGS)
+                .add(log)
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if(task.isSuccessful())
+                            Log.d(TAG, "login event logged successfully.");
+                        else
+                            Log.e(TAG, "login event failed to be logged.");
+                    }
+                });
     }
 }

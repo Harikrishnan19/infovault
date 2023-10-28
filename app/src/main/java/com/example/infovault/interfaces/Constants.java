@@ -1,6 +1,5 @@
-package com.example.infovault.utils;
+package com.example.infovault.interfaces;
 
 public interface Constants {
-    String COL_USERS = "users";
     String[] GENDER_ITEMS = new String[] {"Male", "Female", "Others"};
 }

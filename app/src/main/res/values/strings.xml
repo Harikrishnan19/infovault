@@ -20,4 +20,5 @@
     <string name="save">Save</string>
     <string name="select_gender">Select gender</string>
     <string name="infovault">Infovault</string>
+    <string name="view_logs">View logs</string>
 </resources>
