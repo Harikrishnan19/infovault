@@ -112,7 +112,8 @@ public class RegisterActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             if(user != null){
                                 logRegisterEvent(user);
-                                navigateToHome();
+                                verifyEmail(user);
+                                navigateToVerifyEmail();
                             }
                         } else {
                             // If sign in fails, display a message to the user.
@@ -127,13 +128,26 @@ public class RegisterActivity extends AppCompatActivity {
                 });
     }
 
+    private void verifyEmail(FirebaseUser user) {
+        user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()){
+                    Toast.makeText(RegisterActivity.this, "Please check your email to verify the email registered with us.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(RegisterActivity.this, "Failed to send verification email to your email registered with us.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
     private void navigateToLogin(){
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
 
-    private void navigateToHome(){
-        Intent intent = new Intent(this, MainActivity.class);
+    private void navigateToVerifyEmail(){
+        Intent intent = new Intent(this, VerifyEmailActivity.class);
         startActivity(intent);
     }
 

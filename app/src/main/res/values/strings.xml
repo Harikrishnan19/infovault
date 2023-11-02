@@ -21,4 +21,7 @@
     <string name="select_gender">Select gender</string>
     <string name="infovault">Infovault</string>
     <string name="view_logs">View logs</string>
+    <string name="verify_email_sub_text_1">Please verify the registered email </string>
+    <string name="verify_email_sub_text_2"> with us to proceed</string>
+    <string name="resend_verification_link">Resend Verification Link</string>
 </resources>

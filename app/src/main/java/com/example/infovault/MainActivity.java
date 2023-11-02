@@ -40,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getName();
     private ActivityMainBinding binding;
-    private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onStart() {

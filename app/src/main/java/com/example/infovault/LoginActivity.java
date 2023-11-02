@@ -37,8 +37,10 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
+        if(currentUser != null && currentUser.isEmailVerified()){
             navigateToHome();
+        } else if(currentUser != null){
+            navigateToVerifyEmail();
         }
     }
 
@@ -116,7 +118,12 @@ public class LoginActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             if(user != null){
                                 logLoginEvent(user);
+                            }
+
+                            if(user != null && user.isEmailVerified()){
                                 navigateToHome();
+                            } else if(user != null) {
+                                navigateToVerifyEmail();
                             }
                         } else {
                             // If sign in fails, display a message to the user.
@@ -154,6 +161,11 @@ public class LoginActivity extends AppCompatActivity {
 
     private void navigateToHome(){
         Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+
+    private void navigateToVerifyEmail() {
+        Intent intent = new Intent(this, VerifyEmailActivity.class);
         startActivity(intent);
     }
 

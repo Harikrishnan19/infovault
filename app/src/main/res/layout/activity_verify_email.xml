@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".VerifyEmailActivity"
+    android:gravity="center"
+    android:padding="@dimen/padding_1"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/verify_email_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="@dimen/sub_heading_1"
+        android:layout_marginBottom="@dimen/margin_2"
+        tools:text="Please verify the registered email (abcd@email.com) with us to proceed"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/resend_verification_email_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_2"
+            android:text="@string/resend_verification_link"/>
+        <Button
+            android:id="@+id/logout_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/log_out" />
+    </LinearLayout>
+
+</LinearLayout>
